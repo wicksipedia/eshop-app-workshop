@@ -34,6 +34,8 @@ internal static class KeycloakHostingExtensions
     }
 }
 
-internal class KeycloakContainerResource(string name) : ContainerResource(name), IResourceWithServiceDiscovery
+internal class KeycloakContainerResource(string name) : 
+    ContainerResource(name),
+    IResourceWithServiceDiscovery
 {
 }

@@ -4,12 +4,15 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // Databases
 
-var basketStore = builder.AddRedis("BasketStore").WithRedisCommander();
+var basketStore = builder.AddRedis("BasketStore")
+    // .WithDataVolume()
+    .WithRedisCommander();
 
-var postgresDataStore = "../../postgres-data";
-Directory.CreateDirectory(postgresDataStore);
-
-var postgres = builder.AddPostgres("postgres")
+var postgres = builder.AddPostgres(
+        "postgres"
+        // , password: builder.CreateStablePassword("catalog-password")
+    )
+    // .WithDataVolume()
     .WithPgAdmin();
 
 var catalogDb = postgres.AddDatabase("CatalogDB");
@@ -44,8 +47,8 @@ var orderingApi = builder.AddProject<Ordering_API>("ordering-api")
 
 // Force HTTPS profile for web app (required for OIDC operations)
 var webApp = builder.AddProject<WebApp>("webapp", launchProfileName: "https")
-    .WithReference(basketApi)
     .WithReference(catalogApi)
+    .WithReference(basketApi)
     .WithReference(orderingApi)
     .WithReference(idp);
 
