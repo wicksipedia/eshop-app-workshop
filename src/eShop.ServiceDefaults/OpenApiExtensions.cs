@@ -73,67 +73,67 @@ public static class OpenApiExtensions
 
         services.AddSwaggerGen();
 
-        services.AddOptions<SwaggerGenOptions>()
-            .Configure<ServiceEndPointResolverRegistry>((options, serviceEndPointResolver) =>
-            {
-                /// {
-                ///   "OpenApi": {
-                ///     "Document": {
-                ///         "Title": ..
-                ///         "Version": ..
-                ///         "Description": ..
-                ///     }
-                ///   }
-                /// }
-                var document = openApi.GetRequiredSection("Document");
-
-                var version = document.GetRequiredValue("Version") ?? "v1";
-
-                options.SwaggerDoc(version, new()
-                {
-                    Title = document.GetRequiredValue("Title"),
-                    Version = version,
-                    Description = document.GetRequiredValue("Description")
-                });
-
-                var identitySection = configuration.GetSection("Identity");
-
-                if (!identitySection.Exists())
-                {
-                    // No identity section, so no authentication OpenAPI definition
-                    return;
-                }
-
-                // {
-                //   "Identity": {
-                //     "Audience": "orders",
-                //     "Scopes": {
-                //         "basket": "Basket API"
-                //      }
-                //    }
-                // }
-
-                var identityUri = serviceEndPointResolver.ResolveIdpAuthorityUri(configuration);
-
-                var scopes = identitySection.GetSection("Scopes").GetChildren().ToDictionary(p => p.Key, p => p.Value);
-
-                options.AddSecurityDefinition("oauth2", new()
-                {
-                    Type = SecuritySchemeType.OAuth2,
-                    Flows = new OpenApiOAuthFlows
-                    {
-                        // TODO: Change this to use Authorization Code flow with PKCE
-                        Implicit = new()
-                        {
-                            AuthorizationUrl = new Uri(identityUri, "protocol/openid-connect/auth"),
-                            TokenUrl = new Uri(identityUri, "protocol/openid-connect/token"),
-                            Scopes = scopes,
-                        }
-                    }
-                });
-
-                options.OperationFilter<AuthorizeCheckOperationFilter>([scopes.Keys.ToArray()]);
-            });
+        // services.AddOptions<SwaggerGenOptions>()
+        //     .Configure<ServiceEndPointResolverRegistry>((options, serviceEndPointResolver) =>
+        //     {
+        //         /// {
+        //         ///   "OpenApi": {
+        //         ///     "Document": {
+        //         ///         "Title": ..
+        //         ///         "Version": ..
+        //         ///         "Description": ..
+        //         ///     }
+        //         ///   }
+        //         /// }
+        //         var document = openApi.GetRequiredSection("Document");
+        //
+        //         var version = document.GetRequiredValue("Version") ?? "v1";
+        //
+        //         options.SwaggerDoc(version, new()
+        //         {
+        //             Title = document.GetRequiredValue("Title"),
+        //             Version = version,
+        //             Description = document.GetRequiredValue("Description")
+        //         });
+        //
+        //         var identitySection = configuration.GetSection("Identity");
+        //
+        //         if (!identitySection.Exists())
+        //         {
+        //             // No identity section, so no authentication OpenAPI definition
+        //             return;
+        //         }
+        //
+        //         // {
+        //         //   "Identity": {
+        //         //     "Audience": "orders",
+        //         //     "Scopes": {
+        //         //         "basket": "Basket API"
+        //         //      }
+        //         //    }
+        //         // }
+        //
+        //         var identityUri = serviceEndPointResolver.ResolveIdpAuthorityUri(configuration);
+        //
+        //         var scopes = identitySection.GetSection("Scopes").GetChildren().ToDictionary(p => p.Key, p => p.Value);
+        //
+        //         options.AddSecurityDefinition("oauth2", new()
+        //         {
+        //             Type = SecuritySchemeType.OAuth2,
+        //             Flows = new OpenApiOAuthFlows
+        //             {
+        //                 // TODO: Change this to use Authorization Code flow with PKCE
+        //                 Implicit = new()
+        //                 {
+        //                     AuthorizationUrl = new Uri(identityUri, "protocol/openid-connect/auth"),
+        //                     TokenUrl = new Uri(identityUri, "protocol/openid-connect/token"),
+        //                     Scopes = scopes,
+        //                 }
+        //             }
+        //         });
+        //
+        //         options.OperationFilter<AuthorizeCheckOperationFilter>([scopes.Keys.ToArray()]);
+        //     });
 
         return builder;
     }

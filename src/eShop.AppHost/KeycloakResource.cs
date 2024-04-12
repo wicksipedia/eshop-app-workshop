@@ -1,6 +1,4 @@
-﻿using Aspire.Hosting.Publishing;
-
-namespace Aspire.Hosting;
+﻿namespace Aspire.Hosting;
 
 internal static class KeycloakHostingExtensions
 {
@@ -10,50 +8,29 @@ internal static class KeycloakHostingExtensions
         this IDistributedApplicationBuilder builder,
         string name,
         int? port = null,
-        string? tag = null)
+        string? tag = null,
+        string? configPath = null)
     {
         var keycloakContainer = new KeycloakContainerResource(name);
 
-        return builder
+        var tempBuilder = builder
             .AddResource(keycloakContainer)
-            .WithAnnotation(new ContainerImageAnnotation { Registry = "quay.io", Image = "keycloak/keycloak", Tag = tag ?? "latest" })
-            .WithHttpEndpoint(hostPort: port, containerPort: DefaultContainerPort)
+            .WithAnnotation(new ContainerImageAnnotation
+                { Registry = "quay.io", Image = "keycloak/keycloak", Tag = tag ?? "latest" })
+            .WithHttpEndpoint(port: port, targetPort: DefaultContainerPort)
             .WithEnvironment("KEYCLOAK_ADMIN", "admin")
             .WithEnvironment("KEYCLOAK_ADMIN_PASSWORD", "admin")
-            .WithArgs("start-dev")
-            .WithManifestPublishingCallback(context => WriteKeycloakContainerToManifest(context, keycloakContainer));
-    }
+            .WithArgs("start-dev");
+        // .WithManifestPublishingCallback(context => WriteKeycloakContainerToManifest(context, keycloakContainer));
 
-    public static IResourceBuilder<KeycloakContainerResource> ImportRealms(this IResourceBuilder<KeycloakContainerResource> builder, string source)
-    {
-        builder
-            .WithVolumeMount(source, "/opt/keycloak/data/import", VolumeMountType.Bind)
-            .WithAnnotation(new ExecutableArgsCallbackAnnotation(args =>
-            {
-                args.Clear();
-                args.Add("start-dev");
-                args.Add("--import-realm");
-            }));
-
-        return builder;
-    }
-
-    private static void WriteKeycloakContainerToManifest(ManifestPublishingContext context, KeycloakContainerResource resource)
-    {
-        var manifestResource = new KeycloakContainerResource(resource.Name);
-
-        foreach (var annotation in resource.Annotations)
+        if (!string.IsNullOrWhiteSpace(configPath))
         {
-            if (annotation is not ExecutableArgsCallbackAnnotation)
-            {
-                manifestResource.Annotations.Add(annotation);
-            }
+            tempBuilder
+                .WithBindMount(configPath, "/opt/keycloak/data/import")
+                .WithArgs("--import-realm");
         }
 
-        // Set the container entry point to 'start' instead of 'start-dev'
-        manifestResource.Annotations.Add(new ExecutableArgsCallbackAnnotation(args => args.Add("start")));
-
-        context.WriteContainer(resource);
+        return tempBuilder;
     }
 }
 

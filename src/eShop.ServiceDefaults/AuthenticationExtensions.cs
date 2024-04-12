@@ -44,15 +44,15 @@ public static class AuthenticationExtensions
         return identityUri;
     }
 
-    public static Uri ResolveIdpAuthorityUri(this ServiceEndPointResolverRegistry resolver, IConfiguration configuration, string serviceName = "http://idp")
-    {
-        // Sync over async :(
-        var idpBaseUrl = resolver.ResolveEndPointUrlAsync(serviceName).AsTask().GetAwaiter().GetResult()
-            ?? throw new InvalidOperationException($"Could not resolve IdP address using service name '{serviceName}'.");
-        var identityUri = GetIdpRealmUri(new Uri(idpBaseUrl), configuration);
-
-        return identityUri;
-    }
+    // public static Uri ResolveIdpAuthorityUri(this EndPointResolverRegistry resolver, IConfiguration configuration, string serviceName = "http://idp")
+    // {
+    //     // Sync over async :(
+    //     var idpBaseUrl = resolver.ResolveEndPointUrlAsync(serviceName).AsTask().GetAwaiter().GetResult()
+    //         ?? throw new InvalidOperationException($"Could not resolve IdP address using service name '{serviceName}'.");
+    //     var identityUri = GetIdpRealmUri(new Uri(idpBaseUrl), configuration);
+    //
+    //     return identityUri;
+    // }
 
     private static Uri GetIdpRealmUri(Uri idpBaseUri, IConfiguration configuration)
     {

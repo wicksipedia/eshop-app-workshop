@@ -5,14 +5,19 @@ var builder = DistributedApplication.CreateBuilder(args);
 // Databases
 
 var basketStore = builder.AddRedis("BasketStore").WithRedisCommander();
-var postgres = builder.AddPostgres("postgres").WithPgAdmin();
+
+var postgresDataStore = "../../postgres-data";
+Directory.CreateDirectory(postgresDataStore);
+
+var postgres = builder.AddPostgres("postgres")
+    .WithPgAdmin();
+
 var catalogDb = postgres.AddDatabase("CatalogDB");
 var orderDb = postgres.AddDatabase("OrderingDB");
 
 // Identity Providers
 
-var idp = builder.AddKeycloakContainer("idp", tag: "23.0")
-    .ImportRealms("../Keycloak/data/import");
+var idp = builder.AddKeycloakContainer("idp", tag: "23.0", configPath: "../Keycloak/data/import");
 
 // DB Manager Apps
 
@@ -37,20 +42,19 @@ var orderingApi = builder.AddProject<Ordering_API>("ordering-api")
 
 // Apps
 
-var webApp = builder.AddProject<WebApp>("webapp")
+// Force HTTPS profile for web app (required for OIDC operations)
+var webApp = builder.AddProject<WebApp>("webapp", launchProfileName: "https")
     .WithReference(basketApi)
     .WithReference(catalogApi)
     .WithReference(orderingApi)
-    .WithReference(idp)
-    // Force HTTPS profile for web app (required for OIDC operations)
-    .WithLaunchProfile("https");
+    .WithReference(idp);
 
 // Inject the project URLs for Keycloak realm configuration
-idp.WithEnvironment("WEBAPP_HTTP", () => webApp.GetEndpoint("http").UriString);
-idp.WithEnvironment("WEBAPP_HTTPS", () => webApp.GetEndpoint("https").UriString);
-idp.WithEnvironment("ORDERINGAPI_HTTP", () => orderingApi.GetEndpoint("http").UriString);
+idp.WithEnvironment("WEBAPP_HTTP", () => webApp.GetEndpoint("http").Url);
+idp.WithEnvironment("WEBAPP_HTTPS", () => webApp.GetEndpoint("https").Url);
+idp.WithEnvironment("ORDERINGAPI_HTTP", () => orderingApi.GetEndpoint("http").Url);
 
 // Inject assigned URLs for Catalog API
-catalogApi.WithEnvironment("CatalogOptions__PicBaseAddress", () => catalogApi.GetEndpoint("http").UriString);
+catalogApi.WithEnvironment("CatalogOptions__PicBaseAddress", () => catalogApi.GetEndpoint("http").Url);
 
 builder.Build().Run();
