@@ -12,11 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Proto\basket.proto" GrpcServices="Server" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\eShop.ServiceDefaults\eShop.ServiceDefaults.csproj" />
+    <None Include="Proto\basket.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>

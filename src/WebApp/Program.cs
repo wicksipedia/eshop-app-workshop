@@ -2,7 +2,7 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -12,7 +12,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseDefaultExceptionHandler("/Error");
+// app.UseDefaultExceptionHandler("/Error");
 
 if (!app.Environment.IsDevelopment())
 {
@@ -26,10 +26,10 @@ app.UseStaticFiles();
 
 app.UseAntiforgery();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-app.MapForwarder("/product-images/{id}", "http://catalog-api", "/api/v1/catalog/items/{id}/pic");
+// app.MapForwarder("/product-images/{id}", "http://catalog-api", "/api/v1/catalog/items/{id}/pic");
 
 app.Run();

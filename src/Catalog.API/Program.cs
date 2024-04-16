@@ -2,17 +2,17 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-builder.AddDefaultOpenApi();
+// builder.AddServiceDefaults();
+// builder.AddDefaultOpenApi();
 builder.AddApplicationServices();
 
 var app = builder.Build();
 
-app.UseDefaultExceptionHandler();
+// app.UseDefaultExceptionHandler();
 
-app.UseDefaultOpenApi();
+// app.UseDefaultOpenApi();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 app.MapGroup(app.GetOptions<CatalogOptions>().ApiBasePath)
     .WithTags("Catalog API")

@@ -2,16 +2,17 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
+// builder.AddDefaultAuthentication();
 builder.AddApplicationServices();
 
 builder.Services.AddGrpc();
 
 var app = builder.Build();
 
-app.UseDefaultExceptionHandler();
+// app.UseDefaultExceptionHandler();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 app.MapGrpcService<BasketService>();
 

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using eShop.Basket.API.Grpc;
 using eShop.WebApp.Services;
 
 namespace Microsoft.Extensions.Hosting;
@@ -21,22 +20,14 @@ public static class HostingExtensions
         builder.Services.AddHttpForwarderWithServiceDiscovery();
 
         // Application services
-        builder.Services.AddScoped<BasketState>();
         builder.Services.AddScoped<LogOutService>();
-        builder.Services.AddSingleton<BasketService>();
         builder.Services.AddSingleton<IProductImageUrlProvider, ProductImageUrlProvider>();
 
         // HTTP and gRPC client registrations
-        builder.Services.AddGrpcClient<Basket.BasketClient>(o => o.Address = new("http://basket-api"))
-            .AddAuthToken();
 
-        builder.Services.AddHttpClient<CatalogService>(o => o.BaseAddress = new("http://catalog-api"))
-            .AddAuthToken();
+        builder.Services.AddHttpClient<CatalogService>(o => o.BaseAddress = new("http://localhost:5222"));
 
-        builder.Services.AddHttpClient<OrderingService>(o => o.BaseAddress = new("http://ordering-api"))
-            .AddAuthToken();
-
-        builder.Services.AddHttpClient(OpenIdConnectBackchannel, o => o.BaseAddress = new("http://idp"));
+        builder.Services.AddHttpClient(OpenIdConnectBackchannel, o => o.BaseAddress = new("http://localhost:8080"));
     }
 
     public static void AddAuthenticationServices(this IHostApplicationBuilder builder)
@@ -74,11 +65,11 @@ public static class HostingExtensions
 
         static void configure(OpenIdConnectOptions options, IConfiguration configuration, IHttpClientFactory httpClientFactory, IHostEnvironment hostEnvironment)
         {
-            var clientSecret = configuration.GetRequiredSection("Identity").GetRequiredValue("ClientSecret");
+            var clientSecret = configuration.GetRequiredSection("Identity").GetValue<string>("ClientSecret");
             var backchannelHttpClient = httpClientFactory.CreateClient(OpenIdConnectBackchannel);
 
             options.Backchannel = backchannelHttpClient;
-            options.Authority = backchannelHttpClient.GetIdpAuthorityUri(configuration).ToString();
+            options.Authority = "http://localhost:8080/realms/eShop"; //backchannelHttpClient.GetIdpAuthorityUri(configuration).ToString();
             options.ClientId = "webapp";
             options.ClientSecret = clientSecret;
             options.ResponseType = OpenIdConnectResponseType.Code;
@@ -101,4 +92,13 @@ public static class HostingExtensions
         var user = authState.User;
         return user.GetUserName();
     }
+}
+    
+public static class ClaimsPrincipalExtensions
+{
+    public static string? GetUserId(this ClaimsPrincipal principal)
+        => principal.FindFirst("sub")?.Value;
+
+    public static string? GetUserName(this ClaimsPrincipal principal) =>
+        principal.FindFirst(x => x.Type == "name")?.Value;
 }

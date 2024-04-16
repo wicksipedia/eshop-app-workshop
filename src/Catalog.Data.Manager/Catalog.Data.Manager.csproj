@@ -9,11 +9,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Catalog.Data\Catalog.Data.csproj" />
-    <ProjectReference Include="..\eShop.ServiceDefaults\eShop.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" >
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

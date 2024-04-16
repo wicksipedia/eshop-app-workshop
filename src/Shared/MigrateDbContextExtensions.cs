@@ -17,7 +17,7 @@ internal static class MigrateDbContextExtensions
         where TContext : DbContext
     {
         // Enable migration tracing
-        services.AddOpenTelemetry().WithTracing(tracing => tracing.AddSource(ActivitySourceName));
+        // services.AddOpenTelemetry().WithTracing(tracing => tracing.AddSource(ActivitySourceName));
 
         services.AddSingleton(sp => new MigrationHostedService<TContext>(sp, seeder));
         services.AddHostedService(sp => sp.GetRequiredService<MigrationHostedService<TContext>>());

@@ -1,7 +1,0 @@
-﻿namespace eShop.WebApp.Services;
-
-public class ProductImageUrlProvider : IProductImageUrlProvider
-{
-    public string GetProductImageUrl(int productId)
-        => $"product-images/{productId}";
-}
