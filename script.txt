@@ -1,49 +1,159 @@
 
-
-================================================================================================================
-
-KeyCloakResource.cs
-
-================================================================================================================
+Show Solution - can't get it running
 
 
-namespace Aspire.Hosting;
+Add AppHost
+	- AppHost is only meant to help local dev -> it doesn't get shipped
 
-internal static class KeycloakHostingExtensions
-{
-    private const int DefaultContainerPort = 8080;
+Run AppHost - show dashboard
+	- it's a container
+	- it can be run in prod if you want
+	- can't be customised but that may change
+	- it's Blazor + Fluent Design
+	- You can now go to LinkedIn and say you are a Blazor developer
 
-    public static IResourceBuilder<KeycloakContainerResource> AddKeycloakContainer(
-        this IDistributedApplicationBuilder builder,
-        string name,
-        int? port = null,
-        string? tag = null,
-        string? configPath = null)
-    {
-        var keycloakContainer = new KeycloakContainerResource(name);
+=====================================================================================================
 
-        var tempBuilder = builder
-            .AddResource(keycloakContainer)
-            .WithAnnotation(new ContainerImageAnnotation
-                { Registry = "quay.io", Image = "keycloak/keycloak", Tag = tag ?? "latest" })
-            .WithHttpEndpoint(port: port, targetPort: DefaultContainerPort)
-            .WithEnvironment("KEYCLOAK_ADMIN", "admin")
-            .WithEnvironment("KEYCLOAK_ADMIN_PASSWORD", "admin")
-            .WithArgs("start-dev");
+AppHost
 
-        if (!string.IsNullOrWhiteSpace(configPath))
-        {
-            tempBuilder
-                .WithBindMount(configPath, "/opt/keycloak/data/import")
-                .WithArgs("--import-realm");
-        }
+=====================================================================================================
 
-        return tempBuilder;
-    }
-}
+Add package
+	Aspire.Hosting.PostgreSQL
 
-internal class KeycloakContainerResource(string name) :
-    ContainerResource(name),
-    IResourceWithServiceDiscovery
-{
-}
+=====================================================================================================
+
+
+// Databases
+
+var postgres = builder.AddPostgres("postgres")
+    .WithPgAdmin();
+
+var catalogDb = postgres.AddDatabase("CatalogDB");
+
+=====================================================================================================
+
+Run AppHost
+
+Show Containers in OrbStack
+
+Click on PgAdmin - it has some customisations applied
+
+
+=====================================================================================================
+
+Add packages
+	Aspire.Hosting.Azure.PostgreSql
+
+.PublishAsAzurePostgresFlexibleServer()
+
+=====================================================================================================
+
+// DB Manager Apps
+
+builder.AddProject<Projects.Catalog_Data_Manager>("catalog-db-mgr")
+    .WithReference(catalogDb);
+
+// API Apps
+
+var catalogApi = builder.AddProject<Projects.Catalog_API>("catalog-api")
+    .WithReference(catalogDb);
+
+=====================================================================================================
+
+AppHost - Add reference to Catalog Data Manager
+
+// DB Manager Apps
+
+builder.AddProject<Projects.Catalog_Data_Manager>("catalog-db-mgr")
+    .WithReference(catalogDb);
+
+Cmd+Click on Project.Catalog_Data_Manager and explain
+
+Run it - doesn't work, lets add components for Aspire to wire up secrets 
+
+=====================================================================================================
+
+Catalog.Data.Manger -> Change Postgres package to Aspire
+
+Program.cs - change ef wire up
+
+Run it - see logs
+
+No telemetry
+
+=====================================================================================================
+
+Add ServiceDefaults
+
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+<PackageReference Include="Swashbuckle.AspNetCore" />
+
+Go through the extensions file
+
+Catalog.Data.Manger -> Add reference to ServiceDefaults, un-comment program.cs hooks
+
+Show that traces are working
+
+Notice that it's re-seeding the db
+
+=====================================================================================================
+
+AppHost
+
+.WithDataVolume()
+
+Show volume in orbstack
+
+App broke - need to have a stable sql password
+
+dotnet user-secrets set Parameters:postgres-password P@ssw0rd1!
+
+Re-run app a couple of times - now it doesn't reseed
+
+=====================================================================================================
+
+MigrateDbContextExtensions - uncomment migration tracing -> groups calls, nice!
+
+=====================================================================================================
+
+AppHost - add API
+
+
+// API Apps
+
+var catalogApi = builder.AddProject<Projects.Catalog_API>("catalog-api")
+    .WithReference(catalogDb);
+
+CatalogAPI - add ref to service defaults
+Program.cs - uncomment wire up
+
+Run it - see that swagger breaks - need to wire up Catalog.Data to use Aspire
+HostingExtensions.cs - swap to Aspire version
+
+See that it returns data
+
+=====================================================================================================
+
+Let's add the WebApp
+
+AppHost - add ref to WebApp
+
+// Apps
+
+var webApp = builder.AddProject<Projects.WebApp>("webapp")
+    .WithReference(catalogApi);
+
+WebApi - add reference to ServiceDefaults
+Program.cs - uncomment bits
+HostingExtensions.cs - change CatalogService base address
+
+=====================================================================================================
+
+Run it - there's data but no images
+
+Uncomment last comment in program.cs - explain it
+
+=====================================================================================================
+
