@@ -1,6 +1,7 @@
 
 Show Solution - can't get it running
 
+=====================================================================================================
 
 Add AppHost
 	- AppHost is only meant to help local dev -> it doesn't get shipped
@@ -15,8 +16,6 @@ Run AppHost - show dashboard
 =====================================================================================================
 
 AppHost
-
-=====================================================================================================
 
 Add package
 	Aspire.Hosting.PostgreSQL
@@ -153,7 +152,8 @@ HostingExtensions.cs - change CatalogService base address
 
 Run it - there's data but no images
 
-Uncomment last comment in program.cs - explain it
+Program.cs
+app.MapForwarder("/product-images/{id}", "http://catalog-api", "/api/v1/catalog/items/{id}/pic");
 
 =====================================================================================================
 
