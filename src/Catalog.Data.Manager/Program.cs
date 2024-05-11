@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
 
-builder.AddNpgsqlDbContext<CatalogDbContext>("CatalogDB", null,
+builder.Services.AddDbContext<CatalogDbContext>(
+// builder.AddNpgsqlDbContext<CatalogDbContext>("CatalogDB", null,
     optionsBuilder => optionsBuilder.UseNpgsql(npgsqlBuilder =>
         npgsqlBuilder.MigrationsAssembly(typeof(Program).Assembly.GetName().Name)));
 
@@ -14,6 +15,6 @@ builder.Services.AddMigration<CatalogDbContext, CatalogContextSeed>();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 app.Run();

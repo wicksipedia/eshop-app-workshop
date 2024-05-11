@@ -3,11 +3,11 @@ using eShop.WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder.Services.AddHttpForwarderWithServiceDiscovery();
+// builder.Services.AddHttpForwarderWithServiceDiscovery();
 
 // Application services
 builder.Services.AddSingleton<IProductImageUrlProvider, ProductImageUrlProvider>();
@@ -31,10 +31,10 @@ app.UseStaticFiles();
 
 app.UseAntiforgery();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
-app.MapForwarder("/product-images/{id}", "http://catalog-api", "/api/v1/catalog/items/{id}/pic");
+// app.MapForwarder("/product-images/{id}", "http://catalog-api", "/api/v1/catalog/items/{id}/pic");
 
 app.Run();
