@@ -1,5 +1,4 @@
-﻿using System.Web;
-using eShop.WebApp.Components.Catalog;
+﻿using eShop.WebApp.Components.Catalog;
 
 namespace eShop.WebApp.Services;
 
@@ -18,13 +17,6 @@ public class CatalogService(HttpClient httpClient)
     {
         var uri = $"{remoteServiceBaseUrl}items/{id}";
         return httpClient.GetFromJsonAsync<CatalogItem>(uri);
-    }
-
-    public async Task<List<CatalogItem>> GetCatalogItems(IEnumerable<int> ids)
-    {
-        var uri = $"{remoteServiceBaseUrl}items/by?ids={string.Join("&ids=", ids)}";
-        var result = await httpClient.GetFromJsonAsync<List<CatalogItem>>(uri);
-        return result ?? [];
     }
 
     public async Task<IEnumerable<CatalogBrand>> GetBrands()

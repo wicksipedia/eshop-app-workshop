@@ -9,17 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0-preview.6.24214.1" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.0-preview.6.24214.1" />
-    <PackageReference Include="Aspire.Hosting.Redis" Version="8.0.0-preview.6.24214.1" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.0-preview.7.24251.11" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="8.0.0-preview.7.24251.11" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Basket.API\Basket.API.csproj" />
     <ProjectReference Include="..\Catalog.API\Catalog.API.csproj" />
     <ProjectReference Include="..\Catalog.Data.Manager\Catalog.Data.Manager.csproj" />
-    <ProjectReference Include="..\Ordering.API\Ordering.API.csproj" />
-    <ProjectReference Include="..\Ordering.Data.Manager\Ordering.Data.Manager.csproj" />
     <ProjectReference Include="..\WebApp\WebApp.csproj" />
   </ItemGroup>
 
