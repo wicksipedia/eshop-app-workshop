@@ -13,7 +13,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddSingleton<IProductImageUrlProvider, ProductImageUrlProvider>();
 
 // HTTP and gRPC client registrations
-builder.Services.AddHttpClient<CatalogService>(o => o.BaseAddress = new("http://catalog-api"));
+builder.Services.AddHttpClient<CatalogService>(o => o.BaseAddress = new("http://localhost:51234"));
 
 var app = builder.Build();
 
