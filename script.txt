@@ -3,6 +3,8 @@ Show Solution - can't get it running
 
 =====================================================================================================
 
+dotnet new aspire-apphost --name eShop.AppHost
+
 Add AppHost
 	- AppHost is only meant to help local dev -> it doesn't get shipped
 
@@ -68,6 +70,8 @@ No telemetry
 =====================================================================================================
 
 Add ServiceDefaults
+
+dotnet new aspire-servicedefaults --name eShop.ServiceDefaults
 
 Catalog.API && Catalog.Data.Manger -> Add reference to ServiceDefaults, un-comment program.cs hooks
 
