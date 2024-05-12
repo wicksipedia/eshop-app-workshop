@@ -17,4 +17,8 @@
     <!-- <ProjectReference Include="..\eShop.ServiceDefaults\eShop.ServiceDefaults.csproj" /> -->
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Pics\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

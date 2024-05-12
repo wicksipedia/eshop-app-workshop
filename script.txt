@@ -1,0 +1,117 @@
+
+Show Solution - can't get it running
+
+=====================================================================================================
+
+Add AppHost
+	- AppHost is only meant to help local dev -> it doesn't get shipped
+
+Run AppHost - show dashboard
+	- it's a container
+	- it can be run in prod if you want
+	- can't be customised but that may change
+	- it's Blazor + Fluent Design
+	- You can now go to LinkedIn and say you are a Blazor developer
+
+=====================================================================================================
+
+AppHost
+
+dotnet add package Aspire.Hosting.PostgreSQL --prerelease
+dotnet add package Aspire.Hosting.Azure.PostgreSQL --prerelease
+
+
+=====================================================================================================
+
+
+// Databases
+
+var postgres = builder.AddPostgres("postgres")
+    .WithPgAdmin();
+
+var catalogDb = postgres.AddDatabase("CatalogDB");
+
+=====================================================================================================
+
+Run AppHost
+
+Show Containers in OrbStack
+
+======================================================================================================
+
+AppHost - Add reference to Catalog Data Manager and API
+
+// DB Manager Apps
+
+builder.AddProject<Projects.Catalog_Data_Manager>("catalog-db-mgr")
+    .WithReference(catalogDb);
+
+// API Apps
+
+var catalogApi = builder.AddProject<Projects.Catalog_API>("catalog-api")
+    .WithReference(catalogDb);
+
+Cmd+Click on Project.Catalog_Data_Manager and explain
+
+Run it - doesn't work, lets add components for Aspire to wire up secrets 
+
+=====================================================================================================
+
+Catalog.Data && Catalog.Data.Manger -> Change Postgres package to Aspire
+
+Program.cs - change ef wire up
+
+Run it - see logs
+
+No telemetry
+
+=====================================================================================================
+
+Add ServiceDefaults
+
+Catalog.API && Catalog.Data.Manger -> Add reference to ServiceDefaults, un-comment program.cs hooks
+
+Show that traces are working
+
+Notice that it's re-seeding the db
+
+=====================================================================================================
+
+AppHost
+
+.WithDataVolume()
+
+Show volume in orbstack
+
+App broke - need to have a stable sql password
+
+ddotnet user-secrets set parameters:postgres-password Password1
+
+Re-run app a couple of times - now it doesn't reseed
+
+=====================================================================================================
+
+MigrateDbContextExtensions - uncomment migration tracing -> groups calls, nice!
+
+=====================================================================================================
+
+Let's add the WebApp
+
+AppHost - add ref to WebApp
+
+// Apps
+
+var webApp = builder.AddProject<Projects.WebApp>("webapp")
+    .WithReference(catalogApi);
+
+WebApi - add reference to ServiceDefaults
+Program.cs - uncomment bits
+
+=====================================================================================================
+
+Run it - there's data but no images
+
+Program.cs
+app.MapForwarder("/product-images/{id}", "http://catalog-api", "/api/v1/catalog/items/{id}/pic");
+
+=====================================================================================================
